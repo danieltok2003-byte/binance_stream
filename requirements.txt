@@ -1,1 +1,3 @@
 confluent-kafka
+binance-sdk-spot
+python-dotenv
