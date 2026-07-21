@@ -2,7 +2,7 @@ from confluent_kafka import Consumer
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
 consumer_config = {
     'bootstrap.servers': 'localhost:9092',
@@ -13,7 +13,6 @@ consumer_config = {
 consumer = Consumer(consumer_config)
 consumer.subscribe(['orders'])
 
-# --- InfluxDB setup ---
 INFLUX_URL = "http://localhost:8086"
 INFLUX_TOKEN = "my-super-secret-token"
 INFLUX_ORG = "myorg"
@@ -39,7 +38,7 @@ try:
         price = float(order['p'])
         qty = float(order['q'])
         symbol = order['s']
-        ts = datetime.fromtimestamp(order['E'] / 1000)  # E is ms; drop /1000 if you kept it in seconds
+        ts = datetime.fromtimestamp(order['E'] / 1000, tz=timezone.utc)  # <-- fixed
 
         print(f"Received order: {qty} x {symbol} @ ${price} {ts}")
 

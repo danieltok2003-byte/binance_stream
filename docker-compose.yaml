@@ -50,6 +50,8 @@ services:
       - influxdb
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/etc/grafana/dashboards
 
 volumes:
   kafka_kraft:

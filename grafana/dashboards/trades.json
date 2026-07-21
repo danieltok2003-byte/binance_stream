@@ -1,0 +1,78 @@
+{
+  "title": "Trade Stream",
+  "uid": "trades-dashboard",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Price over time",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 16, "x": 0, "y": 0 },
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "targets": [
+        {
+          "query": "from(bucket: \"trades\") |> range(start: -30m) |> filter(fn: (r) => r._measurement == \"trades\") |> filter(fn: (r) => r._field == \"price\")",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Latest price",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 0 },
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "targets": [
+        {
+          "query": "from(bucket: \"trades\") |> range(start: -30m) |> filter(fn: (r) => r._measurement == \"trades\") |> filter(fn: (r) => r._field == \"price\") |> last()",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "currencyUSD", "decimals": 2 }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Trade count (last 5m)",
+      "type": "stat",
+      "gridPos": { "h": 5, "w": 8, "x": 16, "y": 4 },
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "targets": [
+        {
+          "query": "from(bucket: \"trades\") |> range(start: -5m) |> filter(fn: (r) => r._measurement == \"trades\") |> filter(fn: (r) => r._field == \"price\") |> count()",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Volume over time",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 16, "x": 0, "y": 9 },
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "targets": [
+        {
+          "query": "from(bucket: \"trades\") |> range(start: -30m) |> filter(fn: (r) => r._measurement == \"trades\") |> filter(fn: (r) => r._field == \"quantity\")",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Recent trades",
+      "type": "table",
+      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 9 },
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "targets": [
+        {
+          "query": "from(bucket: \"trades\") |> range(start: -30m) |> filter(fn: (r) => r._measurement == \"trades\") |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\") |> sort(columns: [\"_time\"], desc: true) |> limit(n: 20)",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

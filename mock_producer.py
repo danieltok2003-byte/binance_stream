@@ -46,13 +46,13 @@ def generate_mock_agg_trade(symbol: str, price: float, trade_id: int) -> dict:
     }
 
 
-async def agg_trade(num_messages: int = 10, interval_seconds: float = 0.5):
+async def agg_trade(num_messages: int = 100, interval_seconds: float = 0.5):
     """Simulates a short burst of aggTrade messages, same shape as the real stream."""
     price = BASE_PRICE
     try:
         for i in range(num_messages):
             # small random walk so price looks plausible
-            price += random.uniform(-0.5, 0.5)
+            price += random.uniform(-5, 5)
             data = generate_mock_agg_trade(SYMBOL, price, trade_id=1000 + i)
             handle_data(json.dumps(data))
             await asyncio.sleep(interval_seconds)
