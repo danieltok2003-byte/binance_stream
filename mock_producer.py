@@ -17,6 +17,26 @@ producer = Producer(producer_config)
 logging.basicConfig(level=logging.INFO)
 
 SYMBOL = "BNBUSDT"
+
+
+SYMBOLS = ["BNBUSDT", "BTCUSDT", "ETHUSDT", "SOLUSDT", "DOGEUSDT"]
+
+class MockSymbolBehavior:
+    def __init__(self, name, current_price, deviation):
+        self.name = name
+        self.current_price = current_price
+        self.deviation = deviation
+
+SYMBOLS = [
+    MockSymbolBehavior('BNBUSDT', 500, 90),
+    MockSymbolBehavior('BTCUSDT', 1000, 50),
+    MockSymbolBehavior('ETHUSDT', 800, 100),
+    MockSymbolBehavior('SOLUSDT', 200, 40),
+    MockSymbolBehavior('DOGEUSDT', 300, 50)
+]
+
+
+
 BASE_PRICE = 550.00  # rough starting point, doesn't need to be exact
 
 
@@ -46,14 +66,18 @@ def generate_mock_agg_trade(symbol: str, price: float, trade_id: int) -> dict:
     }
 
 
-async def agg_trade(num_messages: int = 100, interval_seconds: float = 0.5):
+async def agg_trade(num_messages: int = 100, interval_seconds: float = 0.1):
     """Simulates a short burst of aggTrade messages, same shape as the real stream."""
-    price = BASE_PRICE
+    i = 0
     try:
-        for i in range(num_messages):
+        # for i in range(num_messages):
+        while True:
             # small random walk so price looks plausible
-            price += random.uniform(-5, 5)
-            data = generate_mock_agg_trade(SYMBOL, price, trade_id=1000 + i)
+            random_symbol = random.choice(SYMBOLS)
+            
+            random_symbol.current_price += random.uniform(-random_symbol.deviation, random_symbol.deviation)
+            data = generate_mock_agg_trade(random_symbol.name, random_symbol.current_price, trade_id=1000 + i)
+            i += 1
             handle_data(json.dumps(data))
             await asyncio.sleep(interval_seconds)
     except Exception as e:
