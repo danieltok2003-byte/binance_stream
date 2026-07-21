@@ -43,7 +43,7 @@
       "datasource": { "type": "influxdb", "uid": "influxdb" },
       "targets": [
         {
-          "query": "from(bucket: \"trades\") |> range(start: -5m) |> filter(fn: (r) => r._measurement == \"trades\") |> filter(fn: (r) => r._field == \"price\") |> count()",
+          "query": "from(bucket: \"trades\") |> range(start: -5m) |> filter(fn: (r) => r._measurement == \"trades\") |> filter(fn: (r) => r._field == \"price\") |> group(columns: [\"symbol\"]) |> count() |> keep(columns: [\"symbol\", \"_value\"])",
           "refId": "A"
         }
       ]
