@@ -1,5 +1,6 @@
 from confluent_kafka import Consumer
 import json
+from datetime import datetime
 
 consumer_config = {
     'bootstrap.servers' : 'localhost:9092',
@@ -25,7 +26,8 @@ try:
         value = msg.value().decode('utf-8')
 
         order = json.loads(value)
-        print(f"Received order: {order['quantity']} x {order['item']} from {order['user']}")
+        print(f"Received order: {order['q']} x {order['s']} @ ${order['p']} {datetime.fromtimestamp(int(order['E']) / 1000)}")
+        # print(f"Received order: {order['q']} x {order['s']} @ ${order['p']} timestamp: {order['E']}")
 except KeyboardInterrupt:
     print('\n Stopping consumer')
 
