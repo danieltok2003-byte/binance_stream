@@ -11,7 +11,7 @@ from binance_sdk_spot.spot import Spot
 load_dotenv()
 
 producer_config = {
-    'bootstrap.servers' : 'localhost:9092' # define 1 broker as starting point to discover full list of servers in cluster
+    'bootstrap.servers' : 'kafka:9092' # define 1 broker as starting point to discover full list of servers in cluster
 }
 
 producer = Producer(producer_config)
@@ -44,7 +44,7 @@ async def agg_trade():
         await asyncio.sleep(5)
         await stream.unsubscribe()
     except Exception as e:
-        logging.error(f"agg_trade() error: {e}")
+        logging.error(f"agg_trade() error: {e}", exc_info=True)
     finally:
         if connection:
             

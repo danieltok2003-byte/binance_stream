@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 producer_config = {
-    'bootstrap.servers': 'localhost:9092'
+    'bootstrap.servers': 'kafka:9092'
 }
 
 producer = Producer(producer_config)

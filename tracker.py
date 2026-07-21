@@ -5,7 +5,7 @@ import json
 from datetime import datetime, timezone
 
 consumer_config = {
-    'bootstrap.servers': 'localhost:9092',
+    'bootstrap.servers': 'kafka:9092',
     'group.id': 'order-tracker',
     'auto.offset.reset': 'earliest'
 }
@@ -13,7 +13,7 @@ consumer_config = {
 consumer = Consumer(consumer_config)
 consumer.subscribe(['orders'])
 
-INFLUX_URL = "http://localhost:8086"
+INFLUX_URL = "http://influxdb:8086"
 INFLUX_TOKEN = "my-super-secret-token"
 INFLUX_ORG = "myorg"
 INFLUX_BUCKET = "trades"
