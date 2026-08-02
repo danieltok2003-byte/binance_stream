@@ -40,10 +40,10 @@ SYMBOLS = [
 BASE_PRICE = 550.00  # rough starting point, doesn't need to be exact
 
 
-def handle_data(data):
+def handle_data(data, topic):
     logging.info(data)
     producer.produce(
-        topic='orders',
+        topic=topic,
         value=f"{data}",
     )
 
@@ -66,7 +66,8 @@ def generate_mock_agg_trade(symbol: str, price: float, trade_id: int) -> dict:
     }
 
 
-async def agg_trade(num_messages: int = 100, interval_seconds: float = 0.1):
+
+async def agg_trade(num_messages: int = 100, interval_seconds: float = 1):
     """Simulates a short burst of aggTrade messages, same shape as the real stream."""
     i = 0
     try:
@@ -78,7 +79,28 @@ async def agg_trade(num_messages: int = 100, interval_seconds: float = 0.1):
             random_symbol.current_price += random.uniform(-random_symbol.deviation, random_symbol.deviation)
             data = generate_mock_agg_trade(random_symbol.name, random_symbol.current_price, trade_id=1000 + i)
             i += 1
-            handle_data(json.dumps(data))
+            handle_data(json.dumps(data), 'trades.agg_trades')
+            await asyncio.sleep(interval_seconds)
+    except Exception as e:
+        logging.error(f"agg_trade() error: {e}")
+    finally:
+        producer.flush()
+
+    
+async def avg_price(num_messages: int = 100, interval_seconds: float = 1):
+    """Simulates a short burst of avg price messages, same shape as the real stream."""
+    i = 0
+    try:
+        # for i in range(num_messages):
+        while True:
+            # small random walk so price looks plausible
+            random_symbol = random.choice(SYMBOLS)
+            
+            random_symbol.current_price += random.uniform(-random_symbol.deviation, random_symbol.deviation)
+            data = generate_mock_agg_trade(random_symbol.name, random_symbol.current_price, trade_id=1000 + i)
+            data = generate_mock_avg_price(random_symbol, 500)
+            i += 1
+            handle_data(json.dumps(data), 'trades.avg_price')
             await asyncio.sleep(interval_seconds)
     except Exception as e:
         logging.error(f"agg_trade() error: {e}")
@@ -86,5 +108,22 @@ async def agg_trade(num_messages: int = 100, interval_seconds: float = 0.1):
         producer.flush()
 
 
+def generate_mock_avg_price(symbol: str, price: float) -> dict:
+    """Builds a payload shaped like Binance's real average price stream event."""
+    now_ms = int(time.time() * 1000)
+    avg = price + random.uniform(-price * 0.001, price * 0.001)
+    return {
+        "e": "avgPrice",        # event type
+        "s": symbol,            # symbol
+        "i": "5m",               # average price interval
+        "w": f"{avg:.2f}",       # average price
+        "T": now_ms,             # last trade time
+    }
+
+
 if __name__ == "__main__":
-    asyncio.run(agg_trade())
+    async def main():
+        await asyncio.gather(
+            agg_trade(),
+            
+        )

@@ -14,7 +14,7 @@ producer_config = {
     'bootstrap.servers' : 'kafka:9092' # define 1 broker as starting point to discover full list of servers in cluster
 }
 
-producer = Producer(producer_config)
+# producer = Producer(producer_config)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,12 +24,13 @@ configuration_ws_streams = ConfigurationWebSocketStreams(
 
 client = Spot(config_ws_streams=configuration_ws_streams)
 
-def handle_data(data):
-    logging.info(data)
-    producer.produce(
-        topic='orders', 
-        value=f"{data}",
-    )
+# def handle_data(data):
+#     logging.info(data)
+#     producer.produce(
+#         topic='orders', 
+#         value=f"{data}",
+#     )
+
 async def agg_trade():
     connection = None
     try:
@@ -38,7 +39,7 @@ async def agg_trade():
         stream = await connection.agg_trade(
             symbol="bnbusdt",
         )
-        stream.on("message", handle_data)
+        # stream.on("message", handle_data)
         
 
         await asyncio.sleep(5)
@@ -49,7 +50,7 @@ async def agg_trade():
         if connection:
             
             await connection.close_connection(close_session=True)
-            producer.flush() # group and send in batch, not 1 by 1 (if fail, before terminate sends unsent - always call before end
+            # producer.flush() # group and send in batch, not 1 by 1 (if fail, before terminate sends unsent - always call before end
 
 if __name__ == "__main__":
     asyncio.run(agg_trade())
