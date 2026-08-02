@@ -29,25 +29,30 @@ def handle_data(data, topic):
         value=f"{data}",
     )
 
+
+tracked_ids = "bitcoin,ethereum,tether,binancecoin,solana"
+
 async def main():
     logging.info(f'Producer started. config: {producer_config} ')
     while True:
         r = requests.get(
             "https://api.coingecko.com/api/v3/simple/price",
-            params={"ids": "bitcoin", "vs_currencies": "usd"},
+            params={"ids": tracked_ids, "vs_currencies": "usd", 'include_last_updated_at': 'true'},
             headers={"x-cg-demo-api-key": key}
             # example return payload: {'bitcoin': {'usd': 63432}}
         )
+
+
         data = r.json()
         print(data)
 
-        reshaped = {
-            's': list(data.keys())[0],
-            'p': data[list(data.keys())[0]]['usd'],
-            'q' : 1,
-            'E' : datetime.datetime.now().timestamp()
-        }
-        handle_data(json.dumps(reshaped), 'trades.agg_trades')
+        # reshaped = {
+        #     's': list(data.keys())[0],
+        #     'p': data[list(data.keys())[0]]['usd'],
+        #     'q' : 1,
+        #     'E' : datetime.datetime.now().timestamp()
+        # }
+        handle_data(json.dumps(data), 'trades.agg_trades')
         time.sleep(60)
 
 

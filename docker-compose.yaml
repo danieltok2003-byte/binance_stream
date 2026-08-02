@@ -68,6 +68,13 @@ services:
     restart: unless-stopped
     environment:
       RUN_IMAGE: true
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./gecko_producer.py
+          target: /app/gecko_producer.py
+        - action: rebuild
+          path: ./requirements.txt
 
   consumer:
     build:
@@ -82,6 +89,13 @@ services:
     restart: unless-stopped
     environment:
       RUN_IMAGE: true
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./gecko_consumer.py
+          target: /app/gecko_consumer.py
+        - action: rebuild
+          path: ./requirements.txt
 
 volumes:
   kafka_kraft:

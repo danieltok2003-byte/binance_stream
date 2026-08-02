@@ -35,24 +35,25 @@ try:
             continue
 
         value = msg.value().decode('utf-8')
-        order = json.loads(value)
+        symbols = json.loads(value)
 
-        price = float(order['p'])
-        qty = float(order['q'])
-        symbol = order['s']
-        ts = datetime.fromtimestamp(order['E'], tz=timezone.utc)  # <-- fixed
 
-        logging.info(f"Received order: {qty} x {symbol} @ ${price} {ts}")
-
-        point = (
-            Point("trades")
-            .tag("symbol", symbol)
-            .field("price", price)
-            .field("quantity", qty)
-            .time(ts)
-        )
+        points = []
+        logging.info('================')
+        logging.info(symbols)
+        for symbol, metadata in symbols.items():
+            price = float(metadata['usd'])
+            ts = datetime.fromtimestamp(metadata['last_updated_at'], tz=timezone.utc)
+            point = (
+                Point("trades")
+                .tag("symbol", symbol)
+                .field("price", price)
+                .time(ts)
+            )
+            logging.info(f"{symbol} @ ${price} {ts}")
+            points.append(point)
         try:
-            write_api.write(bucket=INFLUX_BUCKET, record=point)
+            write_api.write(bucket=INFLUX_BUCKET, record=points)
             logging.info(f"Wrote point: {symbol} @ {price}")
         except Exception as e:
             logging.info(f"INFLUX WRITE FAILED: {e}")
