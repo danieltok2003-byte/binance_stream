@@ -5,6 +5,6 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY tracker.py .
+COPY gecko_consumer.py .
 
-CMD ["python3", "tracker.py"]
+CMD ["python3", "gecko_consumer.py"]

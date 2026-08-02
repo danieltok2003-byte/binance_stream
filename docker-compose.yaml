@@ -66,18 +66,22 @@ services:
       kafka:
         condition: service_healthy
     restart: unless-stopped
+    environment:
+      RUN_IMAGE: true
 
-  tracker:
+  consumer:
     build:
       context: .
-      dockerfile: Dockerfile.tracker
-    container_name: tracker
+      dockerfile: Dockerfile.consumer
+    container_name: consumer
     depends_on:
       kafka:
         condition: service_healthy
       influxdb:
         condition: service_started
     restart: unless-stopped
+    environment:
+      RUN_IMAGE: true
 
 volumes:
   kafka_kraft:

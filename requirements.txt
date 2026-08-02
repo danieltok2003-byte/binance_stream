@@ -1,4 +1,6 @@
 confluent-kafka
-binance-sdk-spot
+# binance-sdk-spot
+coingecko-sdk
 python-dotenv
 influxdb_client
+requests

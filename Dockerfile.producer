@@ -7,8 +7,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 
-COPY producer.py .
-CMD ["python3", "producer.py"]
+COPY gecko_producer.py .
+CMD ["python3", "gecko_producer.py"]
 
 # COPY mock_producer.py .
 # CMD ["python3", "mock_producer.py"]
